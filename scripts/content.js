@@ -62,7 +62,7 @@ console.log("[CS] delight page loaded");
 
         });
 
-        console.log("📌 [FETCH] approved:", approved);
+        console.log("[FETCH] approved:", approved);
         // console.log(html);  // fetch로 받은 HTML 전체 보기
         // console.log(doc.body.innerHTML);
 
@@ -73,7 +73,7 @@ console.log("[CS] delight page loaded");
         });
 
     } catch (err) {
-        console.error("❌ complete 데이터 fetch 중 오류:", err);
+        console.error("[Error] complete 데이터 fetch 중 오류:", err);
     }
 })();
 
@@ -102,7 +102,7 @@ if (location.href.includes("/mypage/complete")) {
 }
 
 function syncFromPage() {
-    console.log("📌 /mypage/complete 페이지 직접 접속 감지 → DOM 파싱 시작");
+    console.log("[CS] /mypage/complete 페이지 직접 접속 감지 → DOM 파싱 시작");
 
     const items = document.querySelectorAll("li.tbody.application_list");
     const approved = [];
@@ -126,4 +126,21 @@ function syncFromPage() {
         type: "SYNC_APPROVED",
         data: approved
     });
+}
+
+// -----------------------
+// Google Calendar 등록 함수
+// -----------------------
+async function addProgramsToCalendar(programs) {
+    try {
+        const token = await getAuthToken();
+
+        for (const p of programs) {
+            await insertCalendarEvent(token, p);
+            console.log("[CS] 캘린더 등록 완료:", p.title);
+        }
+
+    } catch (err) {
+        console.error("[Error] 캘린더 등록 오류:", err);
+    }
 }

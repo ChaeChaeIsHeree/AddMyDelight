@@ -14,14 +14,20 @@
     "activeTab",
     "scripting",
     "identity"
-],
-
-  "host_permissions": [
-    "https://delight.duksung.ac.kr/*",
-    "https://nid.naver.com/*",
-    "https://openapi.naver.com/*",
-    "https://delight.duksung.ac.kr/*"
   ],
+
+   "host_permissions": [
+    "https://delight.duksung.ac.kr/*",
+    "https://www.googleapis.com/*",
+    "https://nid.naver.com/*",
+    "https://openapi.naver.com/*"
+  ],
+
+  "oauth2": {
+    "client_id": "${env.NAVER_CLIENT_ID}",
+    "scopes": ["calendar"],
+    "redirect_uri": "chrome-extension://fnjlbmfefgfopjbonckhnnngcigoeneb/callback.html"
+  },
 
   "background": {
     "service_worker": "background.js"
@@ -37,12 +43,6 @@
     "js": ["scripts/content.js"],
     "run_at": "document_end"
   }
-],
-
-"oauth2": {
-    "client_id": "네이버 Client ID",
-    "scopes": ["calendar"],
-    "redirect_uri": "chrome-extension://__EXTENSION_ID__/callback.html"
-  }
+  ]
 
 }
