@@ -12,9 +12,16 @@
     "scripting",
     "identity"
   ],
-  "host_permissions": [
-    "https://delight.duksung.ac.kr/*"
+   "host_permissions": [
+    "https://delight.duksung.ac.kr/*",
+    "https://www.googleapis.com/*"
   ],
+  "oauth2": {
+    "client_id": "",
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.events"
+    ]
+  },
   "background": {
     "service_worker": "background.js"
   },
