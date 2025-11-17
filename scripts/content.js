@@ -92,7 +92,6 @@ function addToNaverCalendar(title, date, place) {
 }
 
 
-
 // =====================================================================
 // B) 실제 complete 페이지 방문 시 실행되는 코드
 // =====================================================================
@@ -143,4 +142,104 @@ async function addProgramsToCalendar(programs) {
     } catch (err) {
         console.error("[Error] 캘린더 등록 오류:", err);
     }
+}
+
+// =====================================================================
+// IOS 캘린더용 .ics 파일 생성 함수
+// =====================================================================
+
+console.log("[CS] Page Loaded:", location.href);
+
+// 프로그램 상세 페이지에서 데이터 파싱
+if (location.href.includes("/program/all/application/")) {
+    console.log("📌 프로그램 상세 페이지 감지됨");
+
+    const title = document.querySelector(".title b")?.innerText.trim() || "";
+    const timeEls = document.querySelectorAll(".date time");
+    const startDatetime = timeEls[0]?.getAttribute("datetime") || "";
+    const endDatetime = timeEls[1]?.getAttribute("datetime") || "";
+    const place = document.querySelector("i.fa-map-marker + span")?.innerText.trim() || "";
+
+    chrome.storage.local.set({ title, startDatetime, endDatetime, place }, () => {
+        console.log("📌 프로그램 정보 저장 완료");
+    });
+}
+
+
+// ==============================
+//  ✅ 신청 완료 페이지에서 ICS 생성
+// ==============================
+if (location.href.includes("/program/all/view/")) {
+    console.log("📌 신청 완료 페이지 진입 확인");
+
+    const disabledApplyBtn = document.querySelector(".thema_submit_color[disabled]");
+
+    if (disabledApplyBtn) {
+        console.log("📌 신청 완료 상태 확인 → ICS 생성 시작");
+
+        chrome.storage.local.get(
+            ["title", "startDatetime", "endDatetime", "place"],
+            data => {
+                if (!data.title) {
+                    console.error("❌ 저장된 데이터 없음");
+                    return;
+                }
+
+                generateICS(
+                    data.title,
+                    data.startDatetime,
+                    data.endDatetime,
+                    data.place
+                );
+            }
+        );
+    }
+}
+
+
+
+// ==============================
+// ICS GENERATOR
+// ==============================
+function generateICS(title, startISO, endISO, place) {
+    const start = new Date(startISO);
+    const end = new Date(endISO);
+
+    const toUTC = (d) => {
+        const yyyy = d.getUTCFullYear();
+        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const dd = String(d.getUTCDate()).padStart(2, "0");
+        const hh = String(d.getUTCHours()).padStart(2, "0");
+        const mi = String(d.getUTCMinutes()).padStart(2, "0");
+        return `${yyyy}${mm}${dd}T${hh}${mi}00Z`;
+    };
+
+    const dtstart = toUTC(start);
+    const dtend = toUTC(end);
+
+    const uid = `duk-${Date.now()}@auto-calendar`;
+
+    const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${dtstart}
+DTSTART:${dtstart}
+DTEND:${dtend}
+SUMMARY:${title}
+LOCATION:${place}
+END:VEVENT
+END:VCALENDAR`.replace(/\n/g, "\r\n");
+
+    const blob = new Blob([ics], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title}.ics`;
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
