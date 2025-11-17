@@ -10,14 +10,15 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "identity"
+    "identity",
+     "storage"
   ],
    "host_permissions": [
     "https://delight.duksung.ac.kr/*",
     "https://www.googleapis.com/*"
   ],
   "oauth2": {
-    "client_id": "${env.CLIENT_ID}",
+    "client_id": "924893343928-c26c1vog850sljsdg4aqtiv0gi8fbigm.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/calendar.events"
     ]
