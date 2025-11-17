@@ -7,26 +7,42 @@
     "48": "images/default_icon.png",
     "128": "images/default_icon.png"
   },
+
   "permissions": [
+    "storage",
+    "tabs",
     "activeTab",
     "scripting",
     "identity"
-  ],
+],
+
   "host_permissions": [
+    "https://delight.duksung.ac.kr/*",
+    "https://nid.naver.com/*",
+    "https://openapi.naver.com/*",
     "https://delight.duksung.ac.kr/*"
   ],
+
   "background": {
     "service_worker": "background.js"
   },
+
   "action": {
     "default_popup": "popup/popup.html"
   },
+
   "content_scripts": [
   {
     "matches": ["https://delight.duksung.ac.kr/*"],
     "js": ["scripts/content.js"],
     "run_at": "document_end"
   }
-]
+],
+
+"oauth2": {
+    "client_id": "네이버 Client ID",
+    "scopes": ["calendar"],
+    "redirect_uri": "chrome-extension://__EXTENSION_ID__/callback.html"
+  }
 
 }
