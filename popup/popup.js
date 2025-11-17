@@ -1,3 +1,79 @@
+
+// iOS 캘린더에 일정 추가 (ICS 파일 다운로드)
+
+document.getElementById("ios-btn").addEventListener("click", () => {
+    chrome.storage.local.get(["title", "date", "place"], data => {
+        if (!data.title) {
+            alert("저장된 일정이 없습니다!");
+            return;
+        }
+
+        addToAppleCalendar(
+            data.title,
+            data.date,
+            data.place,
+            "덕성 Delight 프로그램 자동 등록"
+        );
+    });
+});
+
+
+function addToAppleCalendar(title, datetime, place, description = "") {
+    const start = new Date(datetime);
+
+    // UTC 기준으로 변환 (ICS 표준)
+    function toUTC(dt) {
+        return {
+            yyyy: dt.getUTCFullYear(),
+            mm: String(dt.getUTCMonth() + 1).padStart(2, "0"),
+            dd: String(dt.getUTCDate()).padStart(2, "0"),
+            hh: String(dt.getUTCHours()).padStart(2, "0"),
+            mi: String(dt.getUTCMinutes()).padStart(2, "0"),
+            ss: "00"
+        };
+    }
+
+    const s = toUTC(start);
+    const e = toUTC(new Date(start.getTime() + 60 * 60 * 1000)); // 1시간 뒤 종료
+
+    const dtstart = `${s.yyyy}${s.mm}${s.dd}T${s.hh}${s.mi}${s.ss}Z`;
+    const dtend   = `${e.yyyy}${e.mm}${e.dd}T${e.hh}${e.mi}${e.ss}Z`;
+
+    const uid = `duk-${Date.now()}@auto-calendar`;
+
+    // macOS에서는 줄바꿈을 CRLF로 넣어야 호환성이 더 좋음
+    const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${dtstart}
+DTSTART:${dtstart}
+DTEND:${dtend}
+SUMMARY:${title}
+LOCATION:${place}
+DESCRIPTION:${description}
+END:VEVENT
+END:VCALENDAR`.replace(/\n/g, "\r\n");
+
+    const blob = new Blob([ics], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title}.ics`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+
+
+
+
+
+// 네이버 코드 
 document.getElementById("login-naver").addEventListener("click", () => {
     chrome.runtime.sendMessage({ type: "NAVER_LOGIN" });
 });
@@ -62,61 +138,3 @@ async function addToNaverCalendarViaAPI({ title, date, place, naverToken }) {
     if (result.result === "success") alert("네이버 캘린더에 일정 등록 완료!");
     else alert("네이버 API 오류 발생");
 }
-
-
-// document.getElementById("add-naver-calendar").addEventListener("click", () => {
-//     chrome.storage.local.get(["title", "date", "place", "naverToken"], data => {
-//         if (!data.naverToken?.access_token) {
-//             alert("먼저 네이버 로그인을 해주세요.");
-//             return;
-//         }
-//         addToNaverCalendarViaAPI(data);
-//     });
-// });
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     const btn = document.getElementById("add-naver-calendar");
-    
-
-//     if (!btn) {
-//         console.error("❌ naver-btn element not found");
-//         return;
-//     }
-
-//     btn.addEventListener("click", () => {
-//         chrome.storage.local.get(["title", "date", "place"], data => {
-//             if (!data.title) {
-//                 console.error("❌ 저장된 데이터 없음");
-//                 return;
-//             }
-
-//             console.log("📌 storage 데이터:", data);
-//             addToNaverCalendar(data.title, data.date, data.place);
-//         });
-//     });
-// });
-
-// function addToNaverCalendar(title, datetime, place) {
-//     const d = new Date(datetime);
-
-//     const yyyy = d.getFullYear();
-//     const mm = String(d.getMonth() + 1).padStart(2, "0");
-//     const dd = String(d.getDate()).padStart(2, "0");
-
-//     const HH = String(d.getHours()).padStart(2, "0");
-//     const MM = String(d.getMinutes()).padStart(2, "0");
-
-//     const startDate = `${yyyy}${mm}${dd}`;
-//     const startTime = `${HH}${MM}`;
-
-//     const url =
-//         `https://calendar.naver.com/calendar/create`
-//         + `?title=${encodeURIComponent(title)}`
-//         + `&startDate=${startDate}`
-//         + `&startTime=${startTime}`
-//         + `&endDate=${startDate}`
-//         + `&endTime=${startTime}`
-//         + `&location=${encodeURIComponent(place)}`;
-
-//     chrome.tabs.create({ url });
-// }
