@@ -17,7 +17,7 @@
     "https://www.googleapis.com/*"
   ],
   "oauth2": {
-    "client_id": "",
+    "client_id": "${env.CLIENT_ID}",
     "scopes": [
       "https://www.googleapis.com/auth/calendar.events"
     ]
