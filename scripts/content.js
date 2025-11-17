@@ -13,9 +13,15 @@ function syncFromPage() {
         const status = item.querySelector("span.status")?.innerText.replace(/\s+/g, "");
         if (status !== "참여승인") return;
 
-        const title = item.querySelector("span.title")?.innerText.trim();
-        const dateText = item.querySelector("span.complete_condition")?.innerText.trim();
-        const place = item.querySelector("span.online")?.innerText.trim();
+        const title = item.querySelector("span.title a")?.innerText.trim();
+
+        const dateText = item.querySelector("span.date time")?.innerText.trim();
+
+        const placeEl = item.querySelector("span.date p:nth-of-type(2)");
+        const place = placeEl ? placeEl.textContent.replace(/\s+/g, "").trim() : "";
+
+        const place2 = item.querySelector("span.date p:nth-of-type(2)")?.innerText
+        .replace(/\s*\S+\s*/, "").trim();
 
         approved.push({ title, dateText, place });
     });
