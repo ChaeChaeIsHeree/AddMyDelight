@@ -14,6 +14,7 @@ Delight 이수내역 페이지 fetch
  * 
  * 
  */
+
 console.log("[BG] background.js loaded");
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -23,7 +24,62 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 });
 
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === "NAVER_LOGIN") {
+        startNaverLogin();
+    }
+    return true;
+});
 
+function startNaverLogin() {
+    const clientId = window._ENV_.NAVER_CLIENT_ID;
+    const redirectURI = encodeURIComponent(chrome.identity.getRedirectURL("callback"));
+    const state = Math.random().toString(36).substring(2);
+
+    const loginUrl =
+        `https://nid.naver.com/oauth2.0/authorize?response_type=code` +
+        `&client_id=${clientId}` +
+        `&redirect_uri=${redirectURI}` +
+        `&state=${state}`;
+
+    chrome.identity.launchWebAuthFlow({
+        url: loginUrl,
+        interactive: true
+    }, redirect => {
+        if (chrome.runtime.lastError || !redirect) {
+            console.error("❌ OAuth 실패:", chrome.runtime.lastError);
+            return;
+        }
+
+        const url = new URL(redirect);
+        const code = url.searchParams.get("code");
+        const state = url.searchParams.get("state");
+
+        exchangeToken(code, state);
+    });
+}
+
+function exchangeToken(code, state) {
+    const clientId = window._ENV_.NAVER_CLIENT_ID;;
+    const clientSecret = window._ENV_.NAVER_CLIENT_SECRET;
+
+    const tokenUrl =
+        `https://nid.naver.com/oauth2.0/token?grant_type=authorization_code` +
+        `&client_id=${clientId}` +
+        `&client_secret=${clientSecret}` +
+        `&code=${code}&state=${state}`;
+
+    fetch(tokenUrl)
+        .then(res => res.json())
+        .then(token => {
+            console.log("🟢 Access Token:", token);
+
+            chrome.storage.local.set({ naverToken: token }, () => {
+                console.log("토큰 저장 완료");
+            });
+        });
+
+  }
 
 // -----------------------
 // Google OAuth 토큰 가져오기
@@ -129,7 +185,7 @@ async function syncCalendar(approvedPrograms) {
         // Delight 승인 목록 key 생성
         const approvedKeys = approvedPrograms.map(p => `${p.title}_${p.date}`);
 
-        // ➕ 1) 승인된 프로그램 중 "새로운" 일정만 추가
+        // 1) 승인된 프로그램 중 "새로운" 일정만 추가
         for (const p of approvedPrograms) {
             const key = `${p.title}_${p.date}`;
 
@@ -159,7 +215,7 @@ async function syncCalendar(approvedPrograms) {
             };
         }
 
-        // 🗑 2) Delight에서 사라진 일정 = 취소된 일정
+        // 2) Delight에서 사라진 일정 = 취소된 일정
         for (const key of Object.keys(savedEvents)) {
             if (!approvedKeys.includes(key)) {
                 const eventId = savedEvents[key].eventId;

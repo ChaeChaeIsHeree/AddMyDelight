@@ -53,6 +53,13 @@ console.log("[CS] delight page loaded");
             const place = item.querySelector("span.date p:nth-of-type(2)")?.innerText.trim();
 
             approved.push({ title, date, place });
+            chrome.storage.local.set({ title, date, place }, () => {
+                console.log("📌 저장 완료:", { title, date, place });
+                if (chrome.runtime.lastError) {
+                        console.error("Storage error:", chrome.runtime.lastError);
+                    }
+                });
+
         });
 
         console.log("[FETCH] approved:", approved);
@@ -69,6 +76,21 @@ console.log("[CS] delight page loaded");
         console.error("[Error] complete 데이터 fetch 중 오류:", err);
     }
 })();
+
+
+function addToNaverCalendar(title, date, place) {
+    const start = new Date(date);
+    const yyyy = start.getFullYear();
+    const mm = String(start.getMonth() + 1).padStart(2, "0");
+    const dd = String(start.getDate()).padStart(2, "0");
+    const hh = String(start.getHours()).padStart(2, "0");
+    const min = String(start.getMinutes()).padStart(2, "0");
+
+    const url = `https://calendar.naver.com/calendar/create?title=${encodeURIComponent(title)}&startDate=${yyyy}${mm}${dd}&startTime=${hh}${min}&endDate=${yyyy}${mm}${dd}&endTime=${hh}${min}&location=${encodeURIComponent(place)}`;
+
+    window.open(url, "_blank");
+}
+
 
 
 // =====================================================================
