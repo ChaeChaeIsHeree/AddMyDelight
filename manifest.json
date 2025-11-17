@@ -20,11 +20,5 @@
   },
   "action": {
     "default_popup": "popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": ["https://delight.duksung.ac.kr/*"],
-      "js": ["content.js"]
-    }
-  ]
+  }
 }
