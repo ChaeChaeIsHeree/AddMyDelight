@@ -19,6 +19,14 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+  {
+    "matches": ["https://delight.duksung.ac.kr/*"],
+    "js": ["scripts/content.js"],
+    "run_at": "document_end"
   }
+]
+
 }
