@@ -9,7 +9,7 @@
     "identity"
   ],
   "host_permissions": [
-    "https://*.duksung.ac.kr/*"
+    "https://delight.duksung.ac.kr/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -19,7 +19,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.duksung.ac.kr/*"],
+      "matches": ["https://delight.duksung.ac.kr/*"],
       "js": ["content.js"]
     }
   ]
