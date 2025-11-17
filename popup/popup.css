@@ -1,0 +1,94 @@
+/* 전체 레이아웃 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: #f7f8fa;
+  width: 280px;
+}
+
+.container {
+  padding: 16px;
+}
+
+/* 타이틀 */
+h1 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.desc {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* 섹션 */
+.section {
+  margin-bottom: 20px;
+}
+
+.section h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* 버튼 공통 */
+.btn {
+  width: 100%;
+  padding: 10px 0;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.15s ease;
+}
+
+/* 네이버 버튼 */
+.naver {
+  background-color: #03c75a;
+  color: white;
+}
+.naver:hover {
+  background-color: #02b352;
+}
+
+.naver-light {
+  background-color: #e5f9ef;
+  color: #03c75a;
+}
+.naver-light:hover {
+  background-color: #d7f4e7;
+}
+
+/* Google Button */
+.google {
+  background-color: #4285f4;
+  color: white;
+}
+.google:hover {
+  background-color: #357ae8;
+}
+
+/* iOS 버튼 */
+.ios {
+  background-color: #000;
+  color: white;
+}
+.ios:hover {
+  background-color: #222;
+}
+
+/* 작은 그림자 */
+.btn {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.btn:active {
+  transform: scale(0.97);
+}
