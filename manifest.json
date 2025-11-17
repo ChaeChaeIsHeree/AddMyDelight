@@ -1,26 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Duksung Calendar Auto-Add",
-  "version": "1.0",
-  "description": "Automatically adds extracurricular application schedules to Google Calendar.",
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "identity"
-  ],
-  "host_permissions": [
-    "https://*.duksung.ac.kr/*"
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "action": {
-    "default_popup": "popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": ["https://*.duksung.ac.kr/*"],
-      "js": ["content.js"]
-    }
-  ]
+  "name": "Minimal Manifest",
+  "version": "1.0.0",
+  "description": "A basic example extension with only required keys",
+  "icons": {
+    "48": "images/default_icon.png",
+    "128": "images/default_icon.png"
+  }
 }
