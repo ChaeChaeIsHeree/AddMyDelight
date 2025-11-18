@@ -1,0 +1,155 @@
+/* ─────────────────────────────
+   🌗 0) 라이트 / 다크 모드 기본 변수 선언
+───────────────────────────── */
+:root {
+  --bg: #f7f8fa;
+  --text: #333;
+  --text-sub: #666;
+  --section-title: #444;
+  --btn-shadow: rgba(0, 0, 0, 0.1);
+
+  --ios-bg: #ffffff;
+  --ios-text: #000;
+  --ios-border: #d0d0d0;
+
+  --naver: #03c75a;
+  --naver-light-bg: #e5f9ef;
+  --naver-light-text: #03c75a;
+
+  --google: #4285f4;
+}
+
+/* 🌙 다크 모드 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1e;
+    --text: #fafafa;
+    --text-sub: #bbbbbb;
+    --section-title: #e0e0e0;
+    --btn-shadow: rgba(255, 255, 255, 0.1);
+
+    --ios-bg: #2c2c2e;
+    --ios-text: #fff;
+    --ios-border: #505050;
+
+    --naver: #03c75a;
+    --naver-light-bg: #113e2a;
+    --naver-light-text: #03c75a;
+
+    --google: #8ab4f8;
+  }
+}
+
+/* ─────────────────────────────
+   1) 전체 레이아웃
+───────────────────────────── */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  width: 280px;
+  color: var(--text);
+}
+
+.container {
+  padding: 16px;
+}
+
+/* ─────────────────────────────
+   2) 헤더
+───────────────────────────── */
+h1 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.desc {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+/* ─────────────────────────────
+   3) 섹션
+───────────────────────────── */
+.section {
+  margin-bottom: 20px;
+}
+
+.section h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--section-title);
+}
+
+/* ─────────────────────────────
+   4) 버튼 공통
+───────────────────────────── */
+.btn {
+  width: 100%;
+  padding: 10px 0;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.15s ease;
+  box-shadow: 0 2px 4px var(--btn-shadow);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ─────────────────────────────
+   5) 네이버
+───────────────────────────── */
+.naver {
+  background-color: var(--naver);
+  color: white;
+}
+.naver:hover {
+  opacity: 0.9;
+}
+
+.naver-light {
+  background-color: var(--naver-light-bg);
+  color: var(--naver-light-text);
+}
+.naver-light:hover {
+  opacity: 0.9;
+}
+
+/* ─────────────────────────────
+   6) Google
+───────────────────────────── */
+.google {
+  background-color: var(--google);
+  color: white;
+}
+.google:hover {
+  opacity: 0.9;
+}
+
+/* ─────────────────────────────
+   ⭐ 7) iOS 스타일 버튼
+      - Light: white + black 문자 + subtle border
+      - Dark: dark gray + white 문자 + subtle border
+───────────────────────────── */
+.ios {
+  background-color: var(--ios-bg);
+  color: var(--ios-text);
+  border: 1px solid var(--ios-border);
+}
+.ios:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 아이콘 간격 */
+.ios::before {
+  content: "📱 ";
+}

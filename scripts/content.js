@@ -144,102 +144,53 @@ async function addProgramsToCalendar(programs) {
     }
 }
 
-// =====================================================================
-// IOS 캘린더용 .ics 파일 생성 함수
-// =====================================================================
+// ios 
 
-console.log("[CS] Page Loaded:", location.href);
+// ===============================
+// popup → content.js 요청 받기
+// ===============================
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === "GET_EVENT_DATA") {
+        const data = extractEventData();
+        sendResponse(data);
+    }
+});
 
-// 프로그램 상세 페이지에서 데이터 파싱
-if (location.href.includes("/program/all/application/")) {
-    console.log("📌 프로그램 상세 페이지 감지됨");
 
-    const title = document.querySelector(".title b")?.innerText.trim() || "";
-    const timeEls = document.querySelectorAll(".date time");
+// ===============================
+// 상세페이지 일정 데이터 추출 함수
+// ===============================
+function extractEventData() {
+    // 🔹 1) 제목 <b> 안의 텍스트
+    const rawTitle = document.querySelector("li .default label b")?.innerText.trim() || "";
+
+    let title = rawTitle.replace(/m\d+\s*점/gi, "")
+                        .replace(/p\d+\s*점/gi, "")
+                        .replace(/\s+/g, " ")
+                        .trim();
+
+    // 🔹 2) time 태그 두 개 (시작 / 종료)
+    const timeEls = document.querySelectorAll("li .default label time");
     const startDatetime = timeEls[0]?.getAttribute("datetime") || "";
     const endDatetime = timeEls[1]?.getAttribute("datetime") || "";
-    const place = document.querySelector("i.fa-map-marker + span")?.innerText.trim() || "";
 
-    chrome.storage.local.set({ title, startDatetime, endDatetime, place }, () => {
-        console.log("📌 프로그램 정보 저장 완료");
-    });
-}
+    // 🔹 3) 장소 <i class="fa fa-map-marker"> 옆 span
+    const place =
+        document.querySelector("i.fa-map-marker + span")?.innerText.trim() || "";
 
+    // 🔹 4) 메모 (문의사항)
+    const email = document.querySelector("i.fa.fa-envelope + span")?.innerText.trim() || "";
+    const phone = document.querySelector("i.fa.fa-phone + span")?.innerText.trim() || "";
 
-// ==============================
-//  ✅ 신청 완료 페이지에서 ICS 생성
-// ==============================
-if (location.href.includes("/program/all/view/")) {
-    console.log("📌 신청 완료 페이지 진입 확인");
+    let memo = "";
+    if (email) memo += `문의 이메일: ${email} `;
+    if (phone) memo += `문의 전화: ${phone}`;
 
-    const disabledApplyBtn = document.querySelector(".thema_submit_color[disabled]");
-
-    if (disabledApplyBtn) {
-        console.log("📌 신청 완료 상태 확인 → ICS 생성 시작");
-
-        chrome.storage.local.get(
-            ["title", "startDatetime", "endDatetime", "place"],
-            data => {
-                if (!data.title) {
-                    console.error("❌ 저장된 데이터 없음");
-                    return;
-                }
-
-                generateICS(
-                    data.title,
-                    data.startDatetime,
-                    data.endDatetime,
-                    data.place
-                );
-            }
-        );
-    }
-}
-
-
-
-// ==============================
-// ICS GENERATOR
-// ==============================
-function generateICS(title, startISO, endISO, place) {
-    const start = new Date(startISO);
-    const end = new Date(endISO);
-
-    const toUTC = (d) => {
-        const yyyy = d.getUTCFullYear();
-        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-        const dd = String(d.getUTCDate()).padStart(2, "0");
-        const hh = String(d.getUTCHours()).padStart(2, "0");
-        const mi = String(d.getUTCMinutes()).padStart(2, "0");
-        return `${yyyy}${mm}${dd}T${hh}${mi}00Z`;
+    return {
+        title,
+        startDatetime,
+        endDatetime,
+        place,
+        memo
     };
-
-    const dtstart = toUTC(start);
-    const dtend = toUTC(end);
-
-    const uid = `duk-${Date.now()}@auto-calendar`;
-
-    const ics =
-`BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${dtstart}
-DTSTART:${dtstart}
-DTEND:${dtend}
-SUMMARY:${title}
-LOCATION:${place}
-END:VEVENT
-END:VCALENDAR`.replace(/\n/g, "\r\n");
-
-    const blob = new Blob([ics], { type: "text/calendar" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${title}.ics`;
-    a.click();
-
-    URL.revokeObjectURL(url);
 }

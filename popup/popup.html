@@ -3,14 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <title>Auto Calendar</title>
+    <link rel="stylesheet" href="popup.css" />
   </head>
+
   <body>
-    <button id="login-naver">Login Naver</button>
-    <button id="add-naver-calendar">Add Naver</button>
-    <button id="google-btn">Add Google</button>
-    <button id="ios-btn">Add iOS</button>
+    <div class="container">
+
+      <h1>📅 Add My De:light</h1>
+      <p class="desc">딜라이트 일정 → 캘린더 자동 등록</p>
+
+      <div class="section">
+        <h2>네이버 캘린더</h2>
+        <button id="login-naver" class="btn naver">네이버 로그인</button>
+        <button id="add-naver-calendar" class="btn naver-light">
+          네이버 캘린더에 추가
+        </button>
+      </div>
+
+      <div class="section">
+        <h2>기타 캘린더</h2>
+        <button id="google-btn" class="btn google">Google Calendar</button>
+        <button id="ios-btn" class="btn ios">iOS 캘린더 추가</button>
+      </div>
+
+    </div>
 
     <script src="popup.js"></script>
   </body>
 </html>
-
