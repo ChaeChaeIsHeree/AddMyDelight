@@ -25,31 +25,31 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 });
 
 // -----------------------
-// Google OAuth 토큰 가져오기
+// Google OAuth 토큰 가져오기 - 테스트용
 // -----------------------
-chrome.identity.getAuthToken({interactive: true}, async (token) => {
-  console.log("TOKEN:", token);
+// chrome.identity.getAuthToken({interactive: true}, async (token) => {
+//   console.log("TOKEN:", token);
 
-  const event = {
-    summary: "테스트 일정",
-    start: { dateTime: new Date().toISOString(), timeZone: "Asia/Seoul" },
-    end: { dateTime: new Date(Date.now()+3600000).toISOString(), timeZone: "Asia/Seoul" }
-  };
+//   const event = {
+//     summary: "테스트 일정",
+//     start: { dateTime: new Date().toISOString(), timeZone: "Asia/Seoul" },
+//     end: { dateTime: new Date(Date.now()+3600000).toISOString(), timeZone: "Asia/Seoul" }
+//   };
 
-  const res = await fetch(
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(event)
-    }
-  );
+//   const res = await fetch(
+//     "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+//     {
+//       method: "POST",
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify(event)
+//     }
+//   );
 
-  console.log("API RESULT:", await res.text());
-});
+//   console.log("API RESULT:", await res.text());
+// });
 
 
 // -----------------------
@@ -126,13 +126,16 @@ async function syncCalendar(approvedPrograms) {
         const savedEvents = stored.savedEvents || {};
 
         // Delight 승인 목록 key 생성
-        const approvedKeys = approvedPrograms.map(p => `${p.title}_${p.date}`);
+        const approvedKeys = approvedPrograms.map(p => `${p.title}_${p.dateISO}`); // dateISO로 변경
+
+        console.log("🔄 캘린더 동기화 시작");
+        console.log("✅ 승인된 프로그램 수:", approvedPrograms.length);
+        console.log("🔍 저장된 이벤트 수:", Object.keys(savedEvents).length);
 
         // 1) 승인된 프로그램 중 "새로운" 일정만 추가
         for (const p of approvedPrograms) {
-            const key = `${p.title}_${p.date}`;
-
-            const start = new Date(p.date);
+            const key = `${p.title}_${p.dateISO}`;
+            const start = new Date(p.dateISO);
             const end = new Date(start.getTime() + 60 * 60 * 1000);
 
             p.startISO = start.toISOString();
@@ -151,7 +154,7 @@ async function syncCalendar(approvedPrograms) {
             savedEvents[key] = {
                 eventId,
                 title: p.title,
-                date: p.date,
+                dateISO: p.dateISO,
                 place: p.place,
                 startISO: p.startISO,
                 endISO: p.endISO
