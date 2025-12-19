@@ -127,6 +127,7 @@ async function syncCalendar(approvedPrograms) {
 
         // Delight 승인 목록 key 생성
         const approvedKeys = approvedPrograms.map(p => `${p.title}_${p.dateISO}`); // dateISO로 변경
+        
 
         console.log("🔄 캘린더 동기화 시작");
         console.log("✅ 승인된 프로그램 수:", approvedPrograms.length);
