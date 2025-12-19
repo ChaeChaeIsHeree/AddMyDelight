@@ -3,6 +3,14 @@ console.log("[CS] delight page loaded");
 // =====================================================================
 // A) 메인 페이지(/ko/) 접근 시 → complete 페이지 데이터 벗겨오기
 // =====================================================================
+function parseKoreanDateToISO(dateText) {
+    // "2025-12-22(월) 09:30"
+    const cleaned = dateText.replace(/\(.*?\)/, "").trim();
+    // "2025-12-22 09:30"
+
+    const [date, time] = cleaned.split(" ");
+    return `${date}T${time}:00`;
+}
 
 (async () => {
     const href = location.href;
@@ -36,41 +44,38 @@ console.log("[CS] delight page loaded");
 
 
         items.forEach((item) => {
+            const status = item.querySelector("span.status")?.innerText
+            .replace(/\s+/g, "")
+            .trim();
 
-            // 1. 참여승인 여부 체크
-            // const status = item.querySelector("span.status")?.innerText.replace(/\s+/g, "");
-            const status = item.querySelector("span.status")?.innerText || "";
-            if (!status.includes("참여승인")) return;
-            console.log(status);
+            if (status !== "참여승인") return;
 
-            // 2. 제목
             const title = item.querySelector("span.title a")?.innerText.trim();
-
-            // 3. 날짜(datetime)
-            const date = item.querySelector("span.date time")?.getAttribute("datetime");
-
-            // 4. 장소
+            const dateText = item.querySelector("span.date time")?.getAttribute("datetime");
             const place = item.querySelector("span.date p:nth-of-type(2)")?.innerText.trim();
 
-            approved.push({ title, date, place });
-            chrome.storage.local.set({ title, date, place }, () => {
-                console.log("📌 저장 완료:", { title, date, place });
-                if (chrome.runtime.lastError) {
-                        console.error("Storage error:", chrome.runtime.lastError);
-                    }
-                });
+            approved.push({
+                title,
+                dateISO: dateText,
+                place
+            });
+});
 
-        });
 
         console.log("[FETCH] approved:", approved);
         // console.log(html);  // fetch로 받은 HTML 전체 보기
         // console.log(doc.body.innerHTML);
 
         // 백그라운드로 데이터 전송
+       if (approved.length > 0) {
         chrome.runtime.sendMessage({
             type: "SYNC_APPROVED",
             data: approved
         });
+} else {
+    console.warn("⚠ 승인 데이터 없음 → 메시지 전송 생략");
+}
+
 
     } catch (err) {
         console.error("[Error] complete 데이터 fetch 중 오류:", err);
@@ -107,16 +112,24 @@ function syncFromPage() {
     const approved = [];
 
     items.forEach((item) => {
-        const status = item.querySelector("span.status")?.innerText.replace(/\s+/g, "");
+        const status = item.querySelector("span.status")?.innerText
+            .replace(/\s+/g, "")
+            .trim();
+
         if (status !== "참여승인") return;
 
         const title = item.querySelector("span.title a")?.innerText.trim();
         const dateText = item.querySelector("span.date time")?.innerText.trim();
+        const dateISO = parseKoreanDateToISO(dateText);
 
         const placeEl = item.querySelector("span.date p:nth-of-type(2)");
         const place = placeEl ? placeEl.textContent.trim() : "";
 
-        approved.push({ title, dateText, place });
+        approved.push({
+            title,
+            dateISO,
+            place
+        });
     });
 
     console.log("[CS] approved (DOM 기반):", approved);
@@ -126,6 +139,7 @@ function syncFromPage() {
         data: approved
     });
 }
+// ===============================
 
 // -----------------------
 // Google Calendar 등록 함수
